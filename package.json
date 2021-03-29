@@ -1,0 +1,24 @@
+{
+  "name": "webprogbase-lab6-graphql-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevInCube/webprogbase-lab6-graphql-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DevInCube/webprogbase-lab6-graphql-server/issues"
+  },
+  "homepage": "https://github.com/DevInCube/webprogbase-lab6-graphql-server#readme",
+  "dependencies": {
+    "apollo-server": "^2.22.2",
+    "graphql": "^15.5.0"
+  }
+}
