@@ -11,6 +11,7 @@ type Post {
 
 type Query {
     me: User
+    login(login: String!, password: String!): String!
     posts: [Post!]!
 }
 

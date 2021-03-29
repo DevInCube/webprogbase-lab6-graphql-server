@@ -19,6 +19,8 @@
   "homepage": "https://github.com/DevInCube/webprogbase-lab6-graphql-server#readme",
   "dependencies": {
     "apollo-server": "^2.22.2",
-    "graphql": "^15.5.0"
+    "dotenv": "^8.2.0",
+    "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1"
   }
 }
