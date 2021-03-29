@@ -1,7 +1,6 @@
 const fs = require("fs");
 const { PubSub, ApolloServer } = require("apollo-server");
-const jwt = require("jsonwebtoken");
-const config = require('./config');
+const auth = require('./auth');
 
 const pubsub = new PubSub();
 
@@ -15,10 +14,14 @@ const server = new ApolloServer({
   cors: true,
   typeDefs: fs.readFileSync("./schema.gql").toString(),
   resolvers,
-  context: (req) => {
+  context: (expressContext) => {
+    const token = expressContext.req.headers.authorization;
     return {
         pubsub,
-        req: req.req,
+        isLoggedIn: !!token,
+        getUser() {
+            return auth.getUser(token);
+        },
     };
   },
 });
