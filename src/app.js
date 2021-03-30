@@ -6,10 +6,13 @@ const database = require('./modules/database');
 const resolvers = require('./resolvers/resolvers');
 
 const pubsub = new PubSub();
+const typeDefs = fs.readFileSync("./schema.gql").toString();
 
 const server = new ApolloServer({
     cors: true,
-    typeDefs: fs.readFileSync("./schema.gql").toString(),
+    introspection: true,
+    playground: true,
+    typeDefs,
     resolvers,
     context: ({req, connection}) => {
         const token = connection  
