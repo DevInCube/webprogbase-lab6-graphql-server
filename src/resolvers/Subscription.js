@@ -6,16 +6,31 @@ async function userIsRoomMember(user, room) {
 
 module.exports = {
   roomCreated: {
-    subscribe: (_, args, { pubsub }) => 
-        pubsub.asyncIterator(["ROOM_CREATED"]),
+    subscribe: (_, args, { pubsub }) => {
+        if (!isLoggedIn) {
+            throw new AuthenticationError("User not authenticated.");
+        }
+
+        return pubsub.asyncIterator(["ROOM_CREATED"]);
+    }
   },
   roomUpdated: {
-    subscribe: (_, args, { pubsub }) => 
-        pubsub.asyncIterator(["ROOM_UPDATED"]),
+    subscribe: (_, args, { pubsub }) => {
+        if (!isLoggedIn) {
+            throw new AuthenticationError("User not authenticated.");
+        }
+
+        return pubsub.asyncIterator(["ROOM_UPDATED"]);
+    }
   },
   roomDeleted: {
-    subscribe: (_, args, { pubsub }) => 
-        pubsub.asyncIterator(["ROOM_DELETED"]),
+    subscribe: (_, args, { pubsub }) => {
+        if (!isLoggedIn) {
+            throw new AuthenticationError("User not authenticated.");
+        }
+
+        return pubsub.asyncIterator(["ROOM_DELETED"]);
+    }
   },
   currentRoomChanged: {
     subscribe: (_, args, context) => withFilter(
