@@ -1,4 +1,4 @@
-const config = require('./config');
+const config = require('../config');
 const jwt = require('jsonwebtoken');
 
 async function getUser(token = "") {

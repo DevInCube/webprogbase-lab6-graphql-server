@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('./../config');
 
 module.exports = {
-    me: (parent, args, context) => {
+    async me(parent, args, context) {
         const {isLoggedIn, getUser} = context;
         if (!isLoggedIn) {
             throw new AuthenticationError("Not authorized");
@@ -11,13 +11,19 @@ module.exports = {
 
         return getUser();
     },
-    login: (parent, {login, password}, context) => {
+    async login(parent, {username, password}, context) {
         const fakeId = Math.random() * 100000 | 0;
         const fakeUser = {
             id: fakeId,
-            login,
+            username,
         };
         const token = jwt.sign(fakeUser, config.jwtSecret);
         return token;
+    },
+    async users(_, {}, {database}) {
+        return database.getUsers();
+    },
+    async rooms(_, {}, {database}) {
+        return database.getRooms();
     }
 }

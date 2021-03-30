@@ -1,31 +1,38 @@
 type User {
-    id: ID!
-    login: String!
+  id: ID!
+  username: String!
+  rooms: [ChatRoom!]!
 }
 
-type Post {
-    id: ID!
-    author: String!
-    comment: String!
+type ChatRoom {
+  id: ID!
+  name: String!
+  owner: User!
+  timestamp: String!
+  lastMessages: [ChatMessage!]!
+}
+
+type ChatMessage {
+  id: ID!
+  timestamp: String!
+  author: User!
+  text: String!
 }
 
 type Query {
-    me: User
-    login(login: String!, password: String!): String!
-    posts: [Post!]!
-}
-
-type Subscription {
-  postCreated: Post
+  me: User
+  login(username: String!, password: String!): String!
+  users: [User!]!
+  rooms: [ChatRoom!]!
 }
 
 type Mutation {
-  createPost(author: String, comment: String): Post
+  createRoom(name: String!): ChatRoom!
+  deleteRoom(id: ID!): ChatRoom
 }
 
-# subscription PostFeed {
-#   postCreated {
-#     author
-#     comment
-#   }
-# }
+type Subscription {
+  roomCreated: ChatRoom
+  roomDeleted: ChatRoom
+  messageCreated: ChatMessage
+}
