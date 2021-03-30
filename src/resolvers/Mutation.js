@@ -71,7 +71,7 @@ module.exports = {
         user.currentRoom = room;
         room.members.push(user);
         pubsub.publish('MEMBER_JOINED', { memberJoined: user });
-        pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: room });
+        pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: user });
         return room;
     },
     async leaveCurrentRoom(_, {}, {isLoggedIn, getUser, database, pubsub}) {
@@ -88,7 +88,7 @@ module.exports = {
         room.members.splice(room.members.findIndex(x => x.id === user.id), 1);
         user.currentRoom = null;
         pubsub.publish('MEMBER_LEAVE', { memberJoined: user });
-        pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: room });
+        pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: user });
         return room;
     },
 };

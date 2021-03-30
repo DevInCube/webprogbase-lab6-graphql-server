@@ -1,3 +1,5 @@
+const { withFilter, AuthenticationError } = require('apollo-server');
+
 module.exports = {
   roomCreated: {
     subscribe: (_, args, { pubsub }) => 
@@ -12,8 +14,18 @@ module.exports = {
         pubsub.asyncIterator(["ROOM_DELETED"]),
   },
   currentRoomChanged: {
-    subscribe: (_, args, { pubsub }) =>
-        pubsub.asyncIterator(["CURRENT_ROOM_CHANGED"]),
+    subscribe: (_, args, context) => withFilter(
+        (_, args, { pubsub, isLoggedIn }) => {
+            if (!isLoggedIn) {
+                throw new AuthenticationError("User not authenticated.");
+            }
+
+            return pubsub.asyncIterator(["CURRENT_ROOM_CHANGED"]);
+        },
+        async ({currentRoomChanged}, variables) => {
+            const user = await context.getUser();
+            return currentRoomChanged.id === user.id;
+        })(_, args, context)
   },
   memberJoined: {
     subscribe: (_, args, { pubsub }) =>
