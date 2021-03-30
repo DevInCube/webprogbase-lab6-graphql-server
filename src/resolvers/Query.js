@@ -11,16 +11,20 @@ module.exports = {
 
         return getUser();
     },
+    async userNameExists(_, {username}, {database}) {
+        const existingUser = await database.getUserByUsername(username);
+        return !!existingUser;
+    },
     async register(_, {username, password}, {database}) {
         const existingUser = await database.getUserByUsername(username);
         if (existingUser) {
             throw new UserInputError("user with this username already exists");
         }
 
-        const fakeUser = await database.createUser(username, await auth.createHash(password));
+        const newUser = await database.createUser(username, await auth.createHash(password));
         const result = { 
-            id: fakeUser.id, 
-            username: fakeUser.username,
+            id: newUser.id, 
+            username: newUser.username,
         };
         return result;
     },
@@ -37,10 +41,18 @@ module.exports = {
         const token = jwt.sign(tokenPayload, config.jwtSecret);
         return token;
     }, 
-    async users(_, {}, {database}) {
+    async users(_, {}, {database, isLoggedIn}) {
+        if (!isLoggedIn) {
+            throw new AuthenticationError("Not authorized");
+        }
+
         return database.getUsers();
     },
-    async rooms(_, {}, {database}) {
+    async rooms(_, {}, {database, isLoggedIn}) {
+        if (!isLoggedIn) {
+            throw new AuthenticationError("Not authorized");
+        }
+
         return database.getRooms();
     }
 }
