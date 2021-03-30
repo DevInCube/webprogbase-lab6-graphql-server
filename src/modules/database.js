@@ -3,13 +3,37 @@ const { v4: uuidv4 } = require('uuid');
 const fakeUser1 = {
     id: uuidv4(),
     username: "fakeUser1",
+    timestamp: new Date().toISOString(),
     currentRoom: null,
+    rooms: [],
 };
 const fakeUser2 = {
     id: uuidv4(),
     username: "fakeUser2",
+    timestamp: new Date().toISOString(),
     currentRoom: null,
+    rooms: [],
 };
+
+const fakeMessage1 = {
+    id: uuidv4(),
+    timestamp: new Date().toISOString(),
+    author: fakeUser1,
+    text: "I am fakeUser1, everyone!",
+};
+
+const fakeRoom1 = {
+    id: uuidv4(),
+    name: "fake-room-1",
+    owner: fakeUser1,
+    timestamp: new Date().toISOString(),
+    members: [],
+    messages: [
+        fakeMessage1,
+    ],
+};
+
+fakeMessage1.room = fakeRoom1;
 
 module.exports = {
     users: [
@@ -17,20 +41,7 @@ module.exports = {
         fakeUser2,
     ],
     rooms: [
-        {
-            id: uuidv4(),
-            name: "fake-room-1",
-            owner: fakeUser1,
-            members: [],
-            messages: [
-                {
-                    id: uuidv4(),
-                    timestamp: new Date().toISOString(),
-                    author: fakeUser1,
-                    text: "I am fakeUser1, everyone!",
-                }
-            ],
-        },
+        fakeRoom1,
     ],
 
     async createUser(username, passwordHash) {
@@ -38,6 +49,7 @@ module.exports = {
             id: uuidv4(),
             username,
             passwordHash,
+            timestamp: new Date().toISOString(),
             rooms: [],
             currentRoom: null,
         };

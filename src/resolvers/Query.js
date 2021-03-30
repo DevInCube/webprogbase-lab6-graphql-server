@@ -35,6 +35,9 @@ module.exports = {
         const result = { 
             id: newUser.id, 
             username: newUser.username,
+            timestamp: newUser.timestamp,
+            rooms: [],
+            currentRoom: null,
         };
         return result;
     },

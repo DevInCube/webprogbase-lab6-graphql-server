@@ -1,6 +1,7 @@
 type User {
   id: ID!
   username: String!
+  timestamp: String!
   rooms: [ChatRoom!]!
   currentRoom: ChatRoom
 }
