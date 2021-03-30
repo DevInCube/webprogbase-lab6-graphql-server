@@ -12,6 +12,7 @@ const resolvers = {
   //
   User: require("./resolvers/User"),
   ChatRoom: require("./resolvers/ChatRoom"),
+  ChatMessage: require("./resolvers/ChatMessage"),
 };
 
 const server = new ApolloServer({

@@ -7,13 +7,15 @@ type User {
 type ChatRoom {
   id: ID!
   name: String!
-  owner: User!
   timestamp: String!
+  owner: User!
+  members: [User!]!
   lastMessages: [ChatMessage!]!
 }
 
 type ChatMessage {
   id: ID!
+  room: ChatRoom!
   timestamp: String!
   author: User!
   text: String!

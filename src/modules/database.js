@@ -18,7 +18,16 @@ module.exports = {
         {
             id: uuidv4(),
             name: "fake-room-1",
-            owner: fakeUser1
+            owner: fakeUser1,
+            members: [],
+            messages: [
+                {
+                    id: uuidv4(),
+                    timestamp: new Date().toISOString(),
+                    author: fakeUser1,
+                    text: "I am fakeUser1, everyone!",
+                }
+            ],
         },
     ],
 
@@ -34,12 +43,18 @@ module.exports = {
         return this.rooms.filter(x => x.owner.id === userId);
     },
 
+    async getMessageRoom(messageId) {
+        return this.rooms.find(x => x.messages.find(m => m.id === messageId)); 
+    },
+
     async createRoom(owner, name) {
         const newRoom = {
             id: uuidv4(),
             timestamp: new Date().toISOString(),
             name,
             owner,
+            members: [],
+            messages: [],
         };
         this.rooms.push(newRoom);
         return newRoom;
