@@ -11,7 +11,7 @@ module.exports = {
 
         return getUser();
     },
-    async userNameExists(_, {username}, {database}) {
+    async usernameExists(_, {username}, {database}) {
         const existingUser = await database.getUserByUsername(username);
         return !!existingUser;
     },
