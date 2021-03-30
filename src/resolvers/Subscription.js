@@ -1,5 +1,9 @@
 const { withFilter, AuthenticationError } = require('apollo-server');
 
+async function userIsRoomMember(user, room) {
+    return !!room.members.find(m => m.id === user.id);
+}
+
 module.exports = {
   roomCreated: {
     subscribe: (_, args, { pubsub }) => 
@@ -28,15 +32,45 @@ module.exports = {
         })(_, args, context)
   },
   memberJoined: {
-    subscribe: (_, args, { pubsub }) =>
-        pubsub.asyncIterator(["MEMBER_JOINED"]),
+    subscribe: (_, args, context) => withFilter(
+        (_, args, { pubsub, isLoggedIn }) => {
+            if (!isLoggedIn) {
+                throw new AuthenticationError("User not authenticated.");
+            }
+
+            return pubsub.asyncIterator(["MEMBER_JOINED"]);
+        },
+        async ({memberJoined}, variables) => {
+            const user = await context.getUser();
+            return userIsRoomMember(user, memberJoined.currentRoom);
+        })(_, args, context)
   },
   memberLeft: {
-    subscribe: (_, args, { pubsub }) =>
-        pubsub.asyncIterator(["MEMBER_LEFT"]),
+    subscribe: (_, args, context) => withFilter(
+        (_, args, { pubsub, isLoggedIn }) => {
+            if (!isLoggedIn) {
+                throw new AuthenticationError("User not authenticated.");
+            }
+
+            return pubsub.asyncIterator(["MEMBER_LEFT"]);
+        },
+        async ({memberLeft}, variables) => {
+            const user = await context.getUser();
+            return userIsRoomMember(user, memberLeft.currentRoom);
+        })(_, args, context)
   },
   messageCreated: {
-    subscribe: (_, args, { pubsub }) =>
-        pubsub.asyncIterator(["MESSAGE_CREATED"]),
+    subscribe: (_, args, context) => withFilter(
+        (_, args, { pubsub, isLoggedIn }) => {
+            if (!isLoggedIn) {
+                throw new AuthenticationError("User not authenticated.");
+            }
+
+            return pubsub.asyncIterator(["MESSAGE_CREATED"]);
+        },
+        async ({messageCreated}, variables) => {
+            const user = await context.getUser();
+            return userIsRoomMember(user, messageCreated.room);
+        })(_, args, context)
   },
 }; 

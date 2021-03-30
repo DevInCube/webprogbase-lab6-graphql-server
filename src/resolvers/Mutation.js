@@ -86,9 +86,24 @@ module.exports = {
         }
 
         room.members.splice(room.members.findIndex(x => x.id === user.id), 1);
+        pubsub.publish('MEMBER_LEAVE', { memberLeft: user });
         user.currentRoom = null;
-        pubsub.publish('MEMBER_LEAVE', { memberJoined: user });
         pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: user });
         return room;
+    },
+    async createMessage(_, {text}, {isLoggedIn, getUser, database, pubsub}) {
+        if (!isLoggedIn) {
+            throw new AuthenticationError("User should be logged in.");
+        }
+
+        const user = await getUser();
+        const room = user.currentRoom;
+        if (!room) {
+            // test throw new UserInputError("User is not in the room");
+        }
+
+        const message = await database.createMessage(user, room, text);
+        pubsub.publish('MESSAGE_CREATED', { messageCreated: message });
+        return message;
     },
 };

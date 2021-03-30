@@ -37,6 +37,7 @@ type Mutation {
   deleteRoom(id: ID!): ChatRoom
   joinRoom(roomId: ID!): ChatRoom
   leaveCurrentRoom: ChatRoom
+  createMessage(text: String!): ChatMessage!
 }
 
 type Subscription {

@@ -18,7 +18,7 @@ module.exports = {
     async register(_, {username, password}, {database}) {
         const existingUser = await database.getUserByUsername(username);
         if (existingUser) {
-            throw new UserInputError("user with this username already exists");
+            throw new UserInputError("User with this username already exists.");
         }
 
         const newUser = await database.createUser(username, await auth.createHash(password));

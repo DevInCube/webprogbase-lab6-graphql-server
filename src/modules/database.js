@@ -38,6 +38,7 @@ module.exports = {
             id: uuidv4(),
             username,
             passwordHash,
+            rooms: [],
             currentRoom: null,
         };
 
@@ -111,5 +112,17 @@ module.exports = {
         }
 
         return null;
+    },
+
+    async createMessage(author, room, text) {
+        const newMessage = {
+            id: uuidv4(),
+            timestamp: new Date().toISOString(),
+            text,
+            author,
+            room,
+        };
+        room.messages.push(newMessage);
+        return newMessage;
     },
 }
