@@ -34,16 +34,15 @@ module.exports = {
     ],
 
     async createUser(username, passwordHash) {
-        const fakeId = Math.random() * 100000 | 0;
-        const fakeUser = {
-            id: fakeId,
+        const newUser = {
+            id: uuidv4(),
             username,
             passwordHash,
             currentRoom: null,
         };
 
-        this.users.push(fakeUser);
-        return fakeUser;
+        this.users.push(newUser);
+        return newUser;
     },
 
     async getUsers() {
