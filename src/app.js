@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { PubSub, ApolloServer } = require("apollo-server");
 const auth = require('./modules/auth');
+const config = require('./config')
 const database = require('./modules/database');
 const resolvers = require('./resolvers/resolvers');
 
@@ -27,7 +28,7 @@ const server = new ApolloServer({
     },
 });
 
-server.listen().then(({ url, subscriptionsUrl }) => {
+server.listen(config.port).then(({ url, subscriptionsUrl }) => {
     console.log(`🚀 Server ready at ${url}`);
     console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
 });
