@@ -1,5 +1,6 @@
 const config = require('../config');
 const jwt = require('jsonwebtoken');
+const crypto = require("crypto");
 
 async function getUser(token = "") {
     if (!token) {
@@ -15,6 +16,11 @@ async function getUser(token = "") {
     return decoded;
 }
 
+async function createHash(password) {
+    return crypto.createHash("sha256").update(password).digest("hex");
+}
+
 module.exports = {
     getUser,
+    createHash,
 };

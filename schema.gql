@@ -22,8 +22,9 @@ type ChatMessage {
 }
 
 type Query {
-  me: User
+  register(username: String!, password: String!): User
   login(username: String!, password: String!): String!
+  me: User
   users: [User!]!
   rooms: [ChatRoom!]!
 }

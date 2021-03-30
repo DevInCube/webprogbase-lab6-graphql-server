@@ -31,8 +31,33 @@ module.exports = {
         },
     ],
 
+    async createUser(username, passwordHash) {
+        const fakeId = Math.random() * 100000 | 0;
+        const fakeUser = {
+            id: fakeId,
+            username,
+            passwordHash,
+        };
+
+        this.users.push(fakeUser);
+        return fakeUser;
+    },
+
     async getUsers() {
         return this.users;
+    },
+
+    async getUserById(id) {
+        return this.users.find(x => x.id === id);
+    },
+
+    async getUserByUsername(username) {
+        return this.users.find(x => x.username === username);
+    },
+
+    async getUserByUsernameAndHash(username, passwordHash) {
+        console.log(passwordHash, this.users)
+        return this.users.find(x => x.username === username && x.passwordHash === passwordHash);
     },
 
     async getRooms() {
