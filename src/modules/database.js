@@ -3,10 +3,12 @@ const { v4: uuidv4 } = require('uuid');
 const fakeUser1 = {
     id: uuidv4(),
     username: "fakeUser1",
+    currentRoom: null,
 };
 const fakeUser2 = {
     id: uuidv4(),
     username: "fakeUser2",
+    currentRoom: null,
 };
 
 module.exports = {
@@ -37,6 +39,7 @@ module.exports = {
             id: fakeId,
             username,
             passwordHash,
+            currentRoom: null,
         };
 
         this.users.push(fakeUser);
@@ -89,6 +92,17 @@ module.exports = {
         return this.rooms.find(x => x.id === id);
     },
 
+    async updateRoom(id, name) {
+        const index = this.rooms.findIndex(x => x.id === id);
+        if (index >= 0) {
+            const updated = this.rooms[index];
+            updated.name = name;
+            return updated;
+        }
+
+        return null;
+    },
+
     async deleteRoom(id) {
         const index = this.rooms.findIndex(x => x.id === id);
         if (index >= 0) {
@@ -98,5 +112,5 @@ module.exports = {
         }
 
         return null;
-    }
+    },
 }

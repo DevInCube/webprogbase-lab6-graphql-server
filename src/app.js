@@ -28,7 +28,8 @@ const server = new ApolloServer({
             database,
             isLoggedIn: !!token,
             async getUser() {
-                const tokenUser = auth.getUser(token);
+                const tokenUser = await auth.getUser(token);
+                console.log(tokenUser);
                 return database.getUserById(tokenUser.id);
             },
         };

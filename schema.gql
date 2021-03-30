@@ -2,6 +2,7 @@ type User {
   id: ID!
   username: String!
   rooms: [ChatRoom!]!
+  currentRoom: ChatRoom
 }
 
 type ChatRoom {
@@ -32,11 +33,18 @@ type Query {
 
 type Mutation {
   createRoom(name: String!): ChatRoom!
+  updateRoom(id: ID!, name: String!): ChatRoom
   deleteRoom(id: ID!): ChatRoom
+  joinRoom(roomId: ID!): ChatRoom
+  #leaveCurrentRoom(): ChatRoom
 }
 
 type Subscription {
   roomCreated: ChatRoom
+  roomUpdated: ChatRoom
   roomDeleted: ChatRoom
+  currentRoomChanged: ChatRoom
+  memberJoined: User
+  #memberLeft: User
   messageCreated: ChatMessage
 }
