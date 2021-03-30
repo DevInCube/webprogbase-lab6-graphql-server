@@ -40,11 +40,11 @@ type Mutation {
 }
 
 type Subscription {
-  roomCreated: ChatRoom
-  roomUpdated: ChatRoom
-  roomDeleted: ChatRoom
+  roomCreated: ChatRoom!
+  roomUpdated: ChatRoom!
+  roomDeleted: ChatRoom!
   currentRoomChanged: ChatRoom
-  memberJoined: User
-  memberLeft: User
-  messageCreated: ChatMessage
+  memberJoined: User!
+  memberLeft: User!
+  messageCreated: ChatMessage!
 }
