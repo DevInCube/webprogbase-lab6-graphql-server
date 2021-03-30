@@ -36,7 +36,7 @@ type Mutation {
   updateRoom(id: ID!, name: String!): ChatRoom
   deleteRoom(id: ID!): ChatRoom
   joinRoom(roomId: ID!): ChatRoom
-  #leaveCurrentRoom(): ChatRoom
+  leaveCurrentRoom: ChatRoom
 }
 
 type Subscription {
@@ -45,6 +45,6 @@ type Subscription {
   roomDeleted: ChatRoom
   currentRoomChanged: ChatRoom
   memberJoined: User
-  #memberLeft: User
+  memberLeft: User
   messageCreated: ChatMessage
 }

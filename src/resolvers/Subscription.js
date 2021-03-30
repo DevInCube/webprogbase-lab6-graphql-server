@@ -19,6 +19,10 @@ module.exports = {
     subscribe: (_, args, { pubsub }) =>
         pubsub.asyncIterator(["MEMBER_JOINED"]),
   },
+  memberLeft: {
+    subscribe: (_, args, { pubsub }) =>
+        pubsub.asyncIterator(["MEMBER_LEFT"]),
+  },
   messageCreated: {
     subscribe: (_, args, { pubsub }) =>
         pubsub.asyncIterator(["MESSAGE_CREATED"]),
