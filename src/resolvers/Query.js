@@ -2,14 +2,24 @@ const { AuthenticationError, UserInputError } = require('apollo-server');
 const jwt = require('jsonwebtoken');
 const config = require('./../config');
 const auth = require('../modules/auth');
+const {
+    USER_NOT_AUTHENTICATED,
+    INVALID_CREDENTIALS,
+    USER_ALREADY_EXISTS,
+} = require('./../constants/errors');
 
 module.exports = {
     async me(_, {}, {isLoggedIn, getUser}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("Not authorized");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        return getUser();
+        const user = await getUser();
+        if (!user) {
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
+        }
+
+        return user;
     },
     async usernameExists(_, {username}, {database}) {
         const existingUser = await database.getUserByUsername(username);
@@ -18,7 +28,7 @@ module.exports = {
     async register(_, {username, password}, {database}) {
         const existingUser = await database.getUserByUsername(username);
         if (existingUser) {
-            throw new UserInputError("User with this username already exists.");
+            throw new UserInputError(USER_ALREADY_EXISTS);
         }
 
         const newUser = await database.createUser(username, await auth.createHash(password));
@@ -31,7 +41,7 @@ module.exports = {
     async login(_, {username, password}, {database}) {
         const user = await database.getUserByUsernameAndHash(username, await auth.createHash(password));
         if (!user) {
-            throw new UserInputError("Invalid credentials");
+            throw new UserInputError(INVALID_CREDENTIALS);
         }
 
         const tokenPayload = { 
@@ -43,14 +53,14 @@ module.exports = {
     }, 
     async users(_, {}, {database, isLoggedIn}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("Not authorized");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         return database.getUsers();
     },
     async rooms(_, {}, {database, isLoggedIn}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("Not authorized");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         return database.getRooms();

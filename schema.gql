@@ -24,7 +24,7 @@ type ChatMessage {
 
 type Query {
   usernameExists(username: String!): Boolean!
-  register(username: String!, password: String!): User
+  register(username: String!, password: String!): User!
   login(username: String!, password: String!): String!
   me: User!
   users: [User!]!

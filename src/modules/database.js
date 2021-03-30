@@ -59,7 +59,6 @@ module.exports = {
     },
 
     async getUserByUsernameAndHash(username, passwordHash) {
-        console.log(passwordHash, this.users)
         return this.users.find(x => x.username === username && x.passwordHash === passwordHash);
     },
 

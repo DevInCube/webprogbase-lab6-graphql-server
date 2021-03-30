@@ -1,4 +1,5 @@
 const { withFilter, AuthenticationError } = require('apollo-server');
+const {USER_NOT_AUTHENTICATED} = require('./../constants/errors');
 
 async function userIsRoomMember(user, room) {
     return !!room.members.find(m => m.id === user.id);
@@ -8,7 +9,7 @@ module.exports = {
   roomCreated: {
     subscribe: (_, args, { pubsub }) => {
         if (!isLoggedIn) {
-            throw new AuthenticationError("User not authenticated.");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         return pubsub.asyncIterator(["ROOM_CREATED"]);
@@ -17,7 +18,7 @@ module.exports = {
   roomUpdated: {
     subscribe: (_, args, { pubsub }) => {
         if (!isLoggedIn) {
-            throw new AuthenticationError("User not authenticated.");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         return pubsub.asyncIterator(["ROOM_UPDATED"]);
@@ -26,7 +27,7 @@ module.exports = {
   roomDeleted: {
     subscribe: (_, args, { pubsub }) => {
         if (!isLoggedIn) {
-            throw new AuthenticationError("User not authenticated.");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         return pubsub.asyncIterator(["ROOM_DELETED"]);
@@ -36,7 +37,7 @@ module.exports = {
     subscribe: (_, args, context) => withFilter(
         (_, args, { pubsub, isLoggedIn }) => {
             if (!isLoggedIn) {
-                throw new AuthenticationError("User not authenticated.");
+                throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["CURRENT_ROOM_CHANGED"]);
@@ -50,7 +51,7 @@ module.exports = {
     subscribe: (_, args, context) => withFilter(
         (_, args, { pubsub, isLoggedIn }) => {
             if (!isLoggedIn) {
-                throw new AuthenticationError("User not authenticated.");
+                throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["MEMBER_JOINED"]);
@@ -64,7 +65,7 @@ module.exports = {
     subscribe: (_, args, context) => withFilter(
         (_, args, { pubsub, isLoggedIn }) => {
             if (!isLoggedIn) {
-                throw new AuthenticationError("User not authenticated.");
+                throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["MEMBER_LEFT"]);
@@ -78,7 +79,7 @@ module.exports = {
     subscribe: (_, args, context) => withFilter(
         (_, args, { pubsub, isLoggedIn }) => {
             if (!isLoggedIn) {
-                throw new AuthenticationError("User not authenticated.");
+                throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["MESSAGE_CREATED"]);

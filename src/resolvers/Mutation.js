@@ -1,10 +1,16 @@
 const { AuthenticationError, ForbiddenError, UserInputError } = require("apollo-server");
-const { deleteRoom } = require("../modules/database");
+const {
+    USER_NOT_AUTHENTICATED,
+    USER_IN_ROOM,
+    USER_NOT_IN_ROOM,
+    USER_NOT_OWNER,
+    ROOM_NOT_FOUND,
+} = require('./../constants/errors');
 
 module.exports = {
     async createRoom(_, {name}, {pubsub, database, isLoggedIn, getUser}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("User should be logged in.");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         const owner = await getUser();
@@ -14,7 +20,7 @@ module.exports = {
     },
     async updateRoom(_, {id, name}, {pubsub, database, isLoggedIn, getUser}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("User should be logged in.");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         const user = await getUser();
@@ -24,7 +30,7 @@ module.exports = {
         }
 
         if (room.owner.id !== user.id) {
-            throw new ForbiddenError("This user is not an owner of this room.");
+            throw new ForbiddenError(USER_NOT_OWNER);
         }
 
         const updatedRoom = await database.updateRoom(id, name);
@@ -33,7 +39,7 @@ module.exports = {
     },
     async deleteRoom(_, {id}, {pubsub, database, isLoggedIn, getUser}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("user should be logged in");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         const user = await getUser();
@@ -43,29 +49,33 @@ module.exports = {
         }
 
         if (room.owner.id !== user.id) {
-            throw new ForbiddenError("this user is not an owner of this room");
+            throw new ForbiddenError(USER_NOT_OWNER);
         }
 
         const deletedRoom = await database.deleteRoom(id);
         pubsub.publish('ROOM_DELETED', { roomDeleted: deletedRoom });
-        // for (const user of deletedRoom.members) {
-        //     pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: room });
-        // }
+
+        // kick all members from deleted room
+        for (const member of deletedRoom.members) {
+            pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: member });
+            member.currentRoom = null;
+        }
+
         return deletedRoom;
     },
     async joinRoom(_, {roomId}, {isLoggedIn, getUser, database, pubsub}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("user should be logged in");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         const room = await database.getRoom(roomId);
         if (!room) {
-            throw new UserInputError("Room not found");
+            throw new UserInputError(ROOM_NOT_FOUND);
         }
 
         const user = await getUser();
         if (user.currentRoom) {
-            throw new UserInputError("User is already in the room");
+            throw new UserInputError(USER_IN_ROOM);
         }
 
         user.currentRoom = room;
@@ -76,13 +86,13 @@ module.exports = {
     },
     async leaveCurrentRoom(_, {}, {isLoggedIn, getUser, database, pubsub}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("User should be logged in.");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         const user = await getUser();
         const room = user.currentRoom;
         if (!room) {
-            throw new UserInputError("User is not in the room");
+            throw new UserInputError(USER_NOT_IN_ROOM);
         }
 
         room.members.splice(room.members.findIndex(x => x.id === user.id), 1);
@@ -93,13 +103,13 @@ module.exports = {
     },
     async createMessage(_, {text}, {isLoggedIn, getUser, database, pubsub}) {
         if (!isLoggedIn) {
-            throw new AuthenticationError("User should be logged in.");
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         const user = await getUser();
         const room = user.currentRoom;
         if (!room) {
-            // test throw new UserInputError("User is not in the room");
+            throw new UserInputError(USER_NOT_IN_ROOM);
         }
 
         const message = await database.createMessage(user, room, text);
