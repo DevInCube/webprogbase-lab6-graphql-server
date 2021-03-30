@@ -44,7 +44,7 @@ type Subscription {
   roomCreated: ChatRoom!
   roomUpdated: ChatRoom!
   roomDeleted: ChatRoom!
-  currentRoomChanged: User
+  currentRoomChanged: User!
   memberJoined: User!
   memberLeft: User!
   messageCreated: ChatMessage!
