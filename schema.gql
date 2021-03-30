@@ -26,17 +26,17 @@ type Query {
   usernameExists(username: String!): Boolean!
   register(username: String!, password: String!): User
   login(username: String!, password: String!): String!
-  me: User
+  me: User!
   users: [User!]!
   rooms: [ChatRoom!]!
 }
 
 type Mutation {
   createRoom(name: String!): ChatRoom!
-  updateRoom(id: ID!, name: String!): ChatRoom
-  deleteRoom(id: ID!): ChatRoom
-  joinRoom(roomId: ID!): ChatRoom
-  leaveCurrentRoom: ChatRoom
+  updateRoom(id: ID!, name: String!): ChatRoom!
+  deleteRoom(id: ID!): ChatRoom!
+  joinRoom(roomId: ID!): ChatRoom!
+  leaveCurrentRoom: ChatRoom!
   createMessage(text: String!): ChatMessage!
 }
 
