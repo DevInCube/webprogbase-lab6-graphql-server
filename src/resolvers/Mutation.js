@@ -8,26 +8,20 @@ const {
 } = require('./../constants/errors');
 
 module.exports = {
-    async createRoom(_, {name}, {pubsub, database, isLoggedIn, getUser}) {
-        if (!isLoggedIn) {
+    async createRoom(_, {name}, {pubsub, database, user}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        const owner = await getUser();
-        if (!owner) {
-            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
-        }
-
-        const newRoom = await database.createRoom(owner, name);
+        const newRoom = await database.createRoom(user, name);
         pubsub.publish('ROOM_CREATED', { roomCreated: newRoom });
         return newRoom;
     },
-    async updateRoom(_, {id, name}, {pubsub, database, isLoggedIn, getUser}) {
-        if (!isLoggedIn) {
+    async updateRoom(_, {id, name}, {pubsub, database, user}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        const user = await getUser();
         const room = await database.getRoom(id);
         if (!room) {
             return null;
@@ -41,12 +35,11 @@ module.exports = {
         pubsub.publish('ROOM_UPDATED', { roomUpdated: updatedRoom });
         return updatedRoom;
     },
-    async deleteRoom(_, {id}, {pubsub, database, isLoggedIn, getUser}) {
-        if (!isLoggedIn) {
+    async deleteRoom(_, {id}, {pubsub, database, user}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        const user = await getUser();
         const room = await database.getRoom(id);
         if (!room) {
             return null;
@@ -67,8 +60,8 @@ module.exports = {
 
         return deletedRoom;
     },
-    async joinRoom(_, {roomId}, {isLoggedIn, getUser, database, pubsub}) {
-        if (!isLoggedIn) {
+    async joinRoom(_, {roomId}, {user, database, pubsub}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
@@ -77,7 +70,6 @@ module.exports = {
             throw new UserInputError(ROOM_NOT_FOUND);
         }
 
-        const user = await getUser();
         if (user.currentRoom) {
             throw new UserInputError(USER_IN_ROOM);
         }
@@ -88,12 +80,11 @@ module.exports = {
         pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: user });
         return room;
     },
-    async leaveCurrentRoom(_, {}, {isLoggedIn, getUser, database, pubsub}) {
-        if (!isLoggedIn) {
+    async leaveCurrentRoom(_, {}, {user, database, pubsub}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        const user = await getUser();
         const room = user.currentRoom;
         if (!room) {
             throw new UserInputError(USER_NOT_IN_ROOM);
@@ -105,12 +96,11 @@ module.exports = {
         pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: user });
         return room;
     },
-    async createMessage(_, {text}, {isLoggedIn, getUser, database, pubsub}) {
-        if (!isLoggedIn) {
+    async createMessage(_, {text}, {user, database, pubsub}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        const user = await getUser();
         const room = user.currentRoom;
         if (!room) {
             throw new UserInputError(USER_NOT_IN_ROOM);

@@ -7,8 +7,8 @@ async function userIsRoomMember(user, room) {
 
 module.exports = {
   roomCreated: {
-    subscribe: (_, args, { isLoggedIn, pubsub }) => {
-        if (!isLoggedIn) {
+    subscribe: (_, args, { user, pubsub }) => {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
@@ -16,8 +16,8 @@ module.exports = {
     }
   },
   roomUpdated: {
-    subscribe: (_, args, { isLoggedIn, pubsub }) => {
-        if (!isLoggedIn) {
+    subscribe: (_, args, { user, pubsub }) => {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
@@ -25,8 +25,8 @@ module.exports = {
     }
   },
   roomDeleted: {
-    subscribe: (_, args, { isLoggedIn, pubsub }) => {
-        if (!isLoggedIn) {
+    subscribe: (_, args, { user, pubsub }) => {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
@@ -35,58 +35,54 @@ module.exports = {
   },
   currentRoomChanged: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { isLoggedIn, pubsub }) => {
-            if (!isLoggedIn) {
+        (_, args, { user, pubsub }) => {
+            if (!user) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["CURRENT_ROOM_CHANGED"]);
         },
         async ({currentRoomChanged}, variables) => {
-            const user = await context.getUser();
-            return currentRoomChanged.id === user.id;
+            return currentRoomChanged.id === context.user.id;
         })(_, args, context)
   },
   memberJoined: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { isLoggedIn, pubsub }) => {
-            if (!isLoggedIn) {
+        (_, args, { user, pubsub }) => {
+            if (!user) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["MEMBER_JOINED"]);
         },
         async ({memberJoined}, variables) => {
-            const user = await context.getUser();
-            return userIsRoomMember(user, memberJoined.currentRoom);
+            return userIsRoomMember(context.user, memberJoined.currentRoom);
         })(_, args, context)
   },
   memberLeft: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { isLoggedIn, pubsub }) => {
-            if (!isLoggedIn) {
+        (_, args, { user, pubsub }) => {
+            if (!user) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["MEMBER_LEFT"]);
         },
         async ({memberLeft}, variables) => {
-            const user = await context.getUser();
-            return userIsRoomMember(user, memberLeft.currentRoom);
+            return userIsRoomMember(context.user, memberLeft.currentRoom);
         })(_, args, context)
   },
   messageCreated: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { isLoggedIn, pubsub }) => {
-            if (!isLoggedIn) {
+        (_, args, { user, pubsub }) => {
+            if (!user) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
 
             return pubsub.asyncIterator(["MESSAGE_CREATED"]);
         },
         async ({messageCreated}, variables) => {
-            const user = await context.getUser();
-            return userIsRoomMember(user, messageCreated.room);
+            return userIsRoomMember(context.user, messageCreated.room);
         })(_, args, context)
   },
 }; 

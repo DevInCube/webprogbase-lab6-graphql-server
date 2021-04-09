@@ -14,19 +14,22 @@ const server = new ApolloServer({
     playground: true,
     typeDefs,
     resolvers,
-    context: ({req, connection}) => {
+    context: async ({req, connection}) => {
         const token = connection  
             ? connection.context.Authorization
             : req.headers.authorization;
         
+        let user = null; 
+        if (token) {
+            const credentials = await auth.getCredentials(token);
+            user = await auth.getUser(credentials, database);
+        }
+        console.log(user)
+
         return {
             pubsub,
             database,
-            isLoggedIn: !!token,
-            async getUser() {
-                const tokenUser = await auth.getUser(token);
-                return database.getUserById(tokenUser.id);
-            },
+            user,
         };
     },
 });

@@ -9,16 +9,11 @@ const {
 } = require('./../constants/errors');
 
 module.exports = {
-    async me(_, {}, {isLoggedIn, getUser}) {
-        if (!isLoggedIn) {
-            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
-        }
-
-        const user = await getUser();
+    async me(_, {}, {user}) {
         if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
-
+        
         return user;
     },
     async usernameExists(_, {username}, {database}) {
@@ -54,15 +49,15 @@ module.exports = {
         const token = jwt.sign(tokenPayload, config.jwtSecret);
         return token;
     }, 
-    async users(_, {}, {database, isLoggedIn}) {
-        if (!isLoggedIn) {
+    async users(_, {}, {database, user}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
         return database.getUsers();
     },
-    async rooms(_, {}, {database, isLoggedIn}) {
-        if (!isLoggedIn) {
+    async rooms(_, {}, {database, user}) {
+        if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
