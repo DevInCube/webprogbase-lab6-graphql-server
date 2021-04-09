@@ -1,5 +1,14 @@
 const { v4: uuidv4 } = require('uuid');
+const auth = require('../modules/auth');
 
+const fakeUser0 = {
+    id: uuidv4(),
+    username: "user",
+    passwordHash: auth.createHash("user"),
+    timestamp: new Date().toISOString(),
+    currentRoom: null,
+    rooms: [],
+};
 const fakeUser1 = {
     id: uuidv4(),
     username: "fakeUser1",
@@ -23,7 +32,7 @@ const fakeMessage1 = {
 };
 
 const fakeRoom1 = {
-    id: uuidv4(),
+    id: "833d4667-26ed-430d-badd-6820637ef639",
     name: "fake-room-1",
     owner: fakeUser1,
     timestamp: new Date().toISOString(),
@@ -37,6 +46,7 @@ fakeMessage1.room = fakeRoom1;
 
 module.exports = {
     users: [
+        fakeUser0,
         fakeUser1,
         fakeUser2,
     ],
@@ -89,7 +99,7 @@ module.exports = {
     async createRoom(owner, name) {
         if (!owner) throw new Error(`Empty owner`);
         if (!name) throw new Error(`Empty name`);
-        
+
         const newRoom = {
             id: uuidv4(),
             timestamp: new Date().toISOString(),

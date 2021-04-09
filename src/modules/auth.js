@@ -50,7 +50,7 @@ async function getUser(credentials, database) {
             return null;
         }
 
-        const hash = await createHash(credentials.payload.password);
+        const hash = createHash(credentials.payload.password);
         if (user.passwordHash !== hash) {
             return null;
         }
@@ -61,7 +61,7 @@ async function getUser(credentials, database) {
     throw new Error(INVALID_TOKEN);
 }
 
-async function createHash(password) {
+function createHash(password) {
     return crypto.createHash("sha256").update(password).digest("hex");
 }
 

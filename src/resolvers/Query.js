@@ -13,7 +13,7 @@ module.exports = {
         if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
-        
+
         return user;
     },
     async usernameExists(_, {username}, {database}) {
@@ -26,7 +26,7 @@ module.exports = {
             throw new UserInputError(USER_ALREADY_EXISTS);
         }
 
-        const newUser = await database.createUser(username, await auth.createHash(password));
+        const newUser = await database.createUser(username, auth.createHash(password));
         const result = { 
             id: newUser.id, 
             username: newUser.username,
@@ -37,7 +37,7 @@ module.exports = {
         return result;
     },
     async login(_, {username, password}, {database}) {
-        const user = await database.getUserByUsernameAndHash(username, await auth.createHash(password));
+        const user = await database.getUserByUsernameAndHash(username, auth.createHash(password));
         if (!user) {
             throw new UserInputError(INVALID_CREDENTIALS);
         }
