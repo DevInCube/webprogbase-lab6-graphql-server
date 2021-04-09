@@ -7,7 +7,7 @@ async function userIsRoomMember(user, room) {
 
 module.exports = {
   roomCreated: {
-    subscribe: (_, args, { pubsub }) => {
+    subscribe: (_, args, { isLoggedIn, pubsub }) => {
         if (!isLoggedIn) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
@@ -16,7 +16,7 @@ module.exports = {
     }
   },
   roomUpdated: {
-    subscribe: (_, args, { pubsub }) => {
+    subscribe: (_, args, { isLoggedIn, pubsub }) => {
         if (!isLoggedIn) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
@@ -25,7 +25,7 @@ module.exports = {
     }
   },
   roomDeleted: {
-    subscribe: (_, args, { pubsub }) => {
+    subscribe: (_, args, { isLoggedIn, pubsub }) => {
         if (!isLoggedIn) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
@@ -35,7 +35,7 @@ module.exports = {
   },
   currentRoomChanged: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { pubsub, isLoggedIn }) => {
+        (_, args, { isLoggedIn, pubsub }) => {
             if (!isLoggedIn) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
@@ -49,7 +49,7 @@ module.exports = {
   },
   memberJoined: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { pubsub, isLoggedIn }) => {
+        (_, args, { isLoggedIn, pubsub }) => {
             if (!isLoggedIn) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
@@ -63,7 +63,7 @@ module.exports = {
   },
   memberLeft: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { pubsub, isLoggedIn }) => {
+        (_, args, { isLoggedIn, pubsub }) => {
             if (!isLoggedIn) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }
@@ -77,7 +77,7 @@ module.exports = {
   },
   messageCreated: {
     subscribe: (_, args, context) => withFilter(
-        (_, args, { pubsub, isLoggedIn }) => {
+        (_, args, { isLoggedIn, pubsub }) => {
             if (!isLoggedIn) {
                 throw new AuthenticationError(USER_NOT_AUTHENTICATED);
             }

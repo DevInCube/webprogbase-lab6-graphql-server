@@ -87,6 +87,9 @@ module.exports = {
     },
 
     async createRoom(owner, name) {
+        if (!owner) throw new Error(`Empty owner`);
+        if (!name) throw new Error(`Empty name`);
+        
         const newRoom = {
             id: uuidv4(),
             timestamp: new Date().toISOString(),

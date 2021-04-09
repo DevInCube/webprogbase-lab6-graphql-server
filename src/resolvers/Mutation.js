@@ -14,6 +14,10 @@ module.exports = {
         }
 
         const owner = await getUser();
+        if (!owner) {
+            throw new AuthenticationError(USER_NOT_AUTHENTICATED);
+        }
+
         const newRoom = await database.createRoom(owner, name);
         pubsub.publish('ROOM_CREATED', { roomCreated: newRoom });
         return newRoom;
