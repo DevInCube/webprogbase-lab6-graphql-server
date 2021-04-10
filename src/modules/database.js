@@ -102,8 +102,8 @@ module.exports = {
 
     async createMessage(author, room, text) {
         room.messages.push({
-            author,
-            room,
+            author: author.id,
+            room: room.id,
             text,
         });
         await room.save();
