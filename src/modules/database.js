@@ -1,31 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.mongo.ObjectId;
 
-const UserModel = mongoose.model('User', {
-    username: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
-    timestamp: { type: Date, required: true, default: Date.now },
-    currentRoom: { type: ObjectId, ref: "ChatRoom" },
-    // rooms
-});
-
-const ChatMessageSchema = {
-    timestamp: { type: Date, required: true, default: Date.now },
-    author: { type: ObjectId, ref: "User" },
-    room: { type: ObjectId, ref: "ChatRoom" },
-    text: { type: String, required: true },
-};
-
-const ChatRoomModel = mongoose.model('ChatRoom', {
-    name: { type: String, required: true, unique: true },
-    owner: { type: ObjectId, ref: "User" },
-    timestamp: { type: Date, required: true, default: Date.now },
-    messages: {
-        type: [ChatMessageSchema],
-        default: [],
-    },
-    // members
-});
+const {UserModel, ChatRoomModel} = require('../models');
 
 module.exports = {
     async connect(url) {
