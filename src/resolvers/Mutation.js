@@ -1,6 +1,8 @@
 const { AuthenticationError, ForbiddenError, UserInputError } = require("apollo-server");
 const {
     USER_NOT_AUTHENTICATED,
+    EMPTY_ROOM_NAME,
+    ROOM_ALREADY_EXISTS,
     USER_IN_ROOM,
     USER_NOT_IN_ROOM,
     USER_NOT_OWNER,
@@ -11,6 +13,15 @@ module.exports = {
     async createRoom(_, {name}, {pubsub, database, user}) {
         if (!user) {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
+        }
+
+        if (!name) {
+            throw new UserInputError(EMPTY_ROOM_NAME);
+        }
+
+        const existingRoom = await database.getRoomByName(name);
+        if (existingRoom) {
+            throw new UserInputError(ROOM_ALREADY_EXISTS);
         }
 
         const newRoom = await database.createRoom(user, name);
@@ -24,11 +35,20 @@ module.exports = {
 
         const room = await database.getRoom(id);
         if (!room) {
-            return null;
+            throw new UserInputError(ROOM_NOT_FOUND);
         }
 
         if (room.owner.id !== user.id) {
             throw new ForbiddenError(USER_NOT_OWNER);
+        }
+
+        if (!name) {
+            throw new UserInputError(EMPTY_ROOM_NAME);
+        }
+
+        const existingRoom = await database.getRoomByName(name);
+        if (existingRoom) {
+            throw new UserInputError(ROOM_ALREADY_EXISTS);
         }
 
         const updatedRoom = await database.updateRoom(id, name);
@@ -42,10 +62,11 @@ module.exports = {
 
         const room = await database.getRoom(id);
         if (!room) {
-            return null;
+            throw new UserInputError(ROOM_NOT_FOUND);
         }
 
         if (room.owner.id !== user.id) {
+            console.log(room.owner.id, user.id);
             throw new ForbiddenError(USER_NOT_OWNER);
         }
 
@@ -53,9 +74,11 @@ module.exports = {
         pubsub.publish('ROOM_DELETED', { roomDeleted: deletedRoom });
 
         // kick all members from deleted room
-        for (const member of deletedRoom.members) {
+        const members = await database.getMembers(room.id);
+        for (const member of members) {
             pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: member });
             member.currentRoom = null;
+            await member.save();
         }
 
         return deletedRoom;
@@ -65,18 +88,18 @@ module.exports = {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
+        if (user.currentRoom) {
+            throw new UserInputError(USER_IN_ROOM);
+        }
+
         const room = await database.getRoom(roomId);
         if (!room) {
             throw new UserInputError(ROOM_NOT_FOUND);
         }
 
-        if (user.currentRoom) {
-            throw new UserInputError(USER_IN_ROOM);
-        }
-
-        user.currentRoom = room;
-        room.members.push(user);
-        pubsub.publish('MEMBER_JOINED', { memberJoined: user });
+        user.currentRoom = roomId;
+        await user.save();
+        pubsub.publish('MEMBER_JOINED', { memberJoined: user, roomId: room.id });
         pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: user });
         return room;
     },
@@ -85,14 +108,18 @@ module.exports = {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        const room = user.currentRoom;
-        if (!room) {
+        if (!user.currentRoom) {
             throw new UserInputError(USER_NOT_IN_ROOM);
         }
 
-        room.members.splice(room.members.findIndex(x => x.id === user.id), 1);
-        pubsub.publish('MEMBER_LEAVE', { memberLeft: user });
+        const room = await database.getRoom(user.currentRoom);
+        if (!room) {
+            throw new UserInputError(ROOM_NOT_FOUND);
+        }
+
         user.currentRoom = null;
+        await user.save();
+        pubsub.publish('MEMBER_LEFT', { memberLeft: user, roomId: room.id });
         pubsub.publish('CURRENT_ROOM_CHANGED', { currentRoomChanged: user });
         return room;
     },
@@ -101,13 +128,17 @@ module.exports = {
             throw new AuthenticationError(USER_NOT_AUTHENTICATED);
         }
 
-        const room = user.currentRoom;
-        if (!room) {
+        if (!user.currentRoom) {
             throw new UserInputError(USER_NOT_IN_ROOM);
         }
 
+        const room = await database.getRoom(user.currentRoom);
+        if (!room) {
+            throw new UserInputError(ROOM_NOT_FOUND);
+        }
+
         const message = await database.createMessage(user, room, text);
-        pubsub.publish('MESSAGE_CREATED', { messageCreated: message });
+        pubsub.publish('MESSAGE_CREATED', { messageCreated: message, roomId: room.id });
         return message;
     },
 };

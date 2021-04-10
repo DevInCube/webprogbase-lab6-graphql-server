@@ -1,10 +1,6 @@
 const { withFilter, AuthenticationError } = require('apollo-server');
 const {USER_NOT_AUTHENTICATED} = require('./../constants/errors');
 
-async function userIsRoomMember(user, room) {
-    return !!room.members.find(m => m.id === user.id);
-}
-
 module.exports = {
   roomCreated: {
     subscribe: (_, args, { user, pubsub }) => {
@@ -55,8 +51,8 @@ module.exports = {
 
             return pubsub.asyncIterator(["MEMBER_JOINED"]);
         },
-        async ({memberJoined}, variables) => {
-            return userIsRoomMember(context.user, memberJoined.currentRoom);
+        async ({memberJoined, roomId}, variables) => {
+            return context.user.currentRoom.equals(roomId);
         })(_, args, context)
   },
   memberLeft: {
@@ -68,8 +64,8 @@ module.exports = {
 
             return pubsub.asyncIterator(["MEMBER_LEFT"]);
         },
-        async ({memberLeft}, variables) => {
-            return userIsRoomMember(context.user, memberLeft.currentRoom);
+        async ({memberLeft, roomId}, variables) => {
+            return context.user.currentRoom.equals(roomId);
         })(_, args, context)
   },
   messageCreated: {
@@ -81,8 +77,8 @@ module.exports = {
 
             return pubsub.asyncIterator(["MESSAGE_CREATED"]);
         },
-        async ({messageCreated}, variables) => {
-            return userIsRoomMember(context.user, messageCreated.room);
+        async ({messageCreated, roomId}, variables) => {
+            return context.user.currentRoom.equals(roomId);
         })(_, args, context)
   },
 }; 

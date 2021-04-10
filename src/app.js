@@ -24,7 +24,6 @@ const server = new ApolloServer({
             const credentials = await auth.getCredentials(token);
             user = await auth.getUser(credentials, database);
         }
-        console.log(user)
 
         return {
             pubsub,
@@ -34,7 +33,14 @@ const server = new ApolloServer({
     },
 });
 
-server.listen(config.port).then(({ url, subscriptionsUrl }) => {
-    console.log(`🚀 Server ready at ${url}`);
-    console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
-});
+void async function init() {
+    try {
+        const _ = await database.connect(config.databaseUrl);
+        console.log(`🚀 Database connected`);
+        const { url, subscriptionsUrl } = await server.listen(config.port);
+        console.log(`🚀 Server ready at ${url}`);
+        console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
+    } catch (err) {
+        console.error(`Start failed`, err);
+    }
+}();

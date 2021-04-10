@@ -1,5 +1,8 @@
 module.exports = {
+    async timestamp(message, {}, {}) {
+        return new Date(message.timestamp).toISOString();
+    },
     async room(message, {}, {database}) {
-        return database.getMessageRoom(message.id);
+        return database.getRoom(message.room);
     }
 }

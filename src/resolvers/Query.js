@@ -4,6 +4,7 @@ const config = require('./../config');
 const auth = require('../modules/auth');
 const {
     USER_NOT_AUTHENTICATED,
+    EMPTY_PASSWORD,
     INVALID_CREDENTIALS,
     USER_ALREADY_EXISTS,
 } = require('./../constants/errors');
@@ -21,6 +22,10 @@ module.exports = {
         return !!existingUser;
     },
     async register(_, {username, password}, {database}) {
+        if (!password) {
+            throw new UserInputError(EMPTY_PASSWORD);
+        }
+
         const existingUser = await database.getUserByUsername(username);
         if (existingUser) {
             throw new UserInputError(USER_ALREADY_EXISTS);
@@ -37,8 +42,13 @@ module.exports = {
         return result;
     },
     async login(_, {username, password}, {database}) {
-        const user = await database.getUserByUsernameAndHash(username, auth.createHash(password));
+        const user = await database.getUserByUsername(username);
         if (!user) {
+            throw new UserInputError(INVALID_CREDENTIALS);
+        }
+
+        const hash = auth.createHash(password);
+        if (user.passwordHash !== hash) {
             throw new UserInputError(INVALID_CREDENTIALS);
         }
 
