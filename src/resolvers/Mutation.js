@@ -38,7 +38,7 @@ module.exports = {
             throw new UserInputError(ROOM_NOT_FOUND);
         }
 
-        if (room.owner.id !== user.id) {
+        if (room.owner !== user.id) {
             throw new ForbiddenError(USER_NOT_OWNER);
         }
 
@@ -65,8 +65,7 @@ module.exports = {
             throw new UserInputError(ROOM_NOT_FOUND);
         }
 
-        if (room.owner.id !== user.id) {
-            console.log(room.owner.id, user.id);
+        if (room.owner !== user.id) {
             throw new ForbiddenError(USER_NOT_OWNER);
         }
 
