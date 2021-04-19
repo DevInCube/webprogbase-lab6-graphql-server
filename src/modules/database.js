@@ -54,7 +54,7 @@ module.exports = {
     },
 
     async getRoom(id) {
-        return ChatRoomModel.findById(new ObjectId(id)).populate("owner");
+        return ChatRoomModel.findById(new ObjectId(id));
     },
 
     async getRoomByName(name) {
