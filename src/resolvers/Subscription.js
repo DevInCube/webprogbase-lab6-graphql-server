@@ -51,7 +51,7 @@ module.exports = {
 
             return pubsub.asyncIterator(["MEMBER_JOINED"]);
         },
-        async ({messageCreated, roomId}, variables, {user, database}) => {
+        async ({memberJoined, roomId}, variables, {user, database}) => {
             const currentUser = await database.getUserById(user.id);
             return currentUser.currentRoom.equals(roomId);
         })(_, args, context)
