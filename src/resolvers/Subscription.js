@@ -51,8 +51,9 @@ module.exports = {
 
             return pubsub.asyncIterator(["MEMBER_JOINED"]);
         },
-        async ({memberJoined, roomId}, variables) => {
-            return context.user.currentRoom.equals(roomId);
+        async ({messageCreated, roomId}, variables, {user, database}) => {
+            const currentUser = await database.getUserById(user.id);
+            return currentUser.currentRoom.equals(roomId);
         })(_, args, context)
   },
   memberLeft: {
@@ -64,8 +65,9 @@ module.exports = {
 
             return pubsub.asyncIterator(["MEMBER_LEFT"]);
         },
-        async ({memberLeft, roomId}, variables) => {
-            return context.user.currentRoom.equals(roomId);
+        async ({messageCreated, roomId}, variables, {user, database}) => {
+            const currentUser = await database.getUserById(user.id);
+            return currentUser.currentRoom.equals(roomId);
         })(_, args, context)
   },
   messageCreated: {
@@ -77,8 +79,9 @@ module.exports = {
 
             return pubsub.asyncIterator(["MESSAGE_CREATED"]);
         },
-        async ({messageCreated, roomId}, variables) => {
-            return context.user.currentRoom.equals(roomId);
+        async ({messageCreated, roomId}, variables, {user, database}) => {
+            const currentUser = await database.getUserById(user.id);
+            return currentUser.currentRoom.equals(roomId);
         })(_, args, context)
   },
 }; 
